@@ -1,5 +1,6 @@
 package com.example.userapi.validation;
 
+import com.example.userapi.dto.UserDTO;
 import com.example.userapi.model.User;
 import org.springframework.stereotype.Component;
 
@@ -14,13 +15,20 @@ public class UserValidator {
         u -> isPasswordValid(u.getPassword()), "El formato de la clave es inválido"
     );
 
-    public void validate(User user) {
+    public void validate(UserDTO user) {
         validations.entrySet().stream()
-            .filter(entry -> !entry.getKey().test(user))
+            .filter(entry -> !entry.getKey().test(convertToUser(user)))
             .findFirst()
             .ifPresent(entry -> {
                 throw new IllegalArgumentException(entry.getValue());
             });
+    }
+
+    private User convertToUser(UserDTO userDTO) {
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        return user;
     }
 
     private static boolean isEmailValid(String email) {

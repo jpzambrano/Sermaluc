@@ -2,10 +2,11 @@ package com.example.userapi;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-
 import javax.crypto.SecretKey;
+import org.springframework.stereotype.Component;
 import java.util.Base64;
 
+@Component
 public class JwtKeyManager {
     private static final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
