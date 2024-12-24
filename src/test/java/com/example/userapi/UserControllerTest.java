@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.example.userapi.controller.UserController;
 import com.example.userapi.dto.PhoneDTO;
 import com.example.userapi.dto.UserDTO;
+import com.example.userapi.dto.UserResponseDTO;
 import com.example.userapi.service.UserService;
 import com.example.userapi.validation.UserValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,14 +46,13 @@ public class UserControllerTest {
         UserDTO request = new UserDTO();
         request.setName("John Doe");
         request.setEmail("john.doe@example.com");
-        request.setPassword("Password@123");
         request.setPhones(List.of(
                 new PhoneDTO("123456789", "1", "57"),
                 new PhoneDTO("987654321", "2", "58")
         ));
 
         // Respuesta simulada del servicio
-        UserDTO response = new UserDTO();
+        UserResponseDTO response = new UserResponseDTO();
         response.setName("John Doe");
         response.setEmail("john.doe@example.com");
         response.setPhones(request.getPhones());
