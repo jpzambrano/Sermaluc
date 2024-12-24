@@ -58,7 +58,7 @@ public class UserControllerTest {
         response.setPhones(request.getPhones());
 
         // Configuración de mocks
-        doNothing().when(userValidator).validate(any(UserDTO.class));
+        doNothing().when(userValidator).validatePhones(any(UserDTO.class));
         when(userService.registerUser(any(), any())).thenReturn(response);
 
         // Ejecutar el test
