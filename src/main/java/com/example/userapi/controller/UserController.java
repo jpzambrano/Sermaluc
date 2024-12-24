@@ -1,10 +1,13 @@
 package com.example.userapi.controller;
 
 import com.example.userapi.dto.UserDTO;
+import com.example.userapi.dto.UserResponseDTO;
 import com.example.userapi.model.Phone;
 import com.example.userapi.service.UserService;
 import com.example.userapi.validation.UserValidator;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +28,17 @@ public class UserController {
     }
 
     @Operation(summary = "Registrar un usuario")
+        @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Error en la validación de los datos"),
+        @ApiResponse(responseCode = "409", description = "Correo ya registrado")
+    })
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO request) {
+    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserDTO request) {
         userValidator.validate(request);
 
         // Registrar usuario y generar respuesta usando streams y lambdas
-        UserDTO savedUserDTO = userService.registerUser(
-            userService.mapToEntity(request),
+        UserResponseDTO savedUserDTO = userService.registerUser(request,
             request.getPhones().stream()
                     .map(phoneDTO -> new Phone(phoneDTO.getNumber(), phoneDTO.getCityCode(), phoneDTO.getCountryCode()))
                     .toList()
