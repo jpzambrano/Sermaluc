@@ -3,6 +3,7 @@ package com.example.userapi.service;
 import com.example.userapi.JwtKeyManager;
 import com.example.userapi.dto.PhoneDTO;
 import com.example.userapi.dto.UserDTO;
+import com.example.userapi.dto.UserResponseDTO;
 import com.example.userapi.model.Phone;
 import com.example.userapi.model.User;
 import com.example.userapi.repository.UserRepository;
@@ -19,27 +20,34 @@ import java.util.UUID;
 public class UserService {
 
       private final UserRepository userRepository;
-    private final JwtKeyManager jwtKeyManager;
 
     public UserService(UserRepository userRepository, JwtKeyManager jwtKeyManager) {
         this.userRepository = userRepository;
-        this.jwtKeyManager = jwtKeyManager;
     }
 
-    public UserDTO registerUser(User user, List<Phone> phones) {
+    public UserResponseDTO registerUser(UserDTO userDTO ,List<Phone> phones) {
         // Asociar teléfonos al usuario
-        phones.forEach(phone -> phone.setUser(user));
-        user.setPhones(phones);
-
-        // Configurar propiedades del usuario
-        user.setId(UUID.randomUUID());
-        user.setCreated(LocalDateTime.now());
-        user.setModified(LocalDateTime.now());
-        user.setLastLogin(LocalDateTime.now());
-        user.setActive(true);
-
-        // Generar y asignar token
+        User user = User.builder()
+                .name(userDTO.getName())
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .id(UUID.randomUUID())
+                .created(LocalDateTime.now())
+                .modified(LocalDateTime.now())
+                .lastLogin(LocalDateTime.now())
+                .isActive(true)
+                .phones(userDTO.getPhones() != null ? userDTO.getPhones().stream()
+                .map(phoneDTO -> Phone.builder()
+                        .number(phoneDTO.getNumber())
+                        .cityCode(phoneDTO.getCityCode())
+                        .countryCode(phoneDTO.getCountryCode())
+                        .build()) // user será asignado luego
+                .toList() : null)
+                .build();
         user.setToken(generateToken(user));
+        if (user.getPhones() != null) {
+            user.getPhones().forEach(phone -> phone.setUser(user));
+        }
 
         // Guardar usuario en cascada
         User savedUser = userRepository.save(user);
@@ -48,7 +56,7 @@ public class UserService {
     }
 
     private String generateToken(User user) {
-        SecretKey secretKey = jwtKeyManager.getSecretKey();
+        SecretKey secretKey = JwtKeyManager.getSecretKey();
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
@@ -58,39 +66,31 @@ public class UserService {
                 .compact();
     }
 
-    public UserDTO mapToDTO(User user) {
+    public UserResponseDTO mapToDTO(User user) {
         List<PhoneDTO> phoneDTOs = user.getPhones().stream()
                 .map(phone -> new PhoneDTO(phone.getNumber(), phone.getCityCode(), phone.getCountryCode()))
                 .toList();
 
-        return new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.isActive(),
-                user.getToken(),
-                user.getCreated().toString(),
-                user.getModified().toString(),
-                user.getLastLogin().toString(),
-                user.getPassword(),
-                phoneDTOs
-        );
-    }
-    public User mapToEntity(UserDTO dto) {
-        return User.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .password(dto.getPassword())
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .created(user.getCreated().toString())
+                .modified(user.getModified().toString())
+                .lastLogin(user.getLastLogin().toString())
+                .isActive(user.isActive())
+                .token(user.getToken())
+                .phones(phoneDTOs)
                 .build();
     }
-    
+   
     public List<Phone> mapToPhoneEntities(List<PhoneDTO> phoneDTOs) {
         return phoneDTOs.stream()
-                .map(phoneDTO -> new Phone(
-                        phoneDTO.getNumber(),
-                        phoneDTO.getCityCode(),
-                        phoneDTO.getCountryCode()
-                ))
+                .map(phoneDTO -> Phone.builder()
+                        .number(phoneDTO.getNumber())
+                        .cityCode(phoneDTO.getCityCode())
+                        .countryCode(phoneDTO.getCountryCode())
+                        .build())
                 .toList();
     }
 }
