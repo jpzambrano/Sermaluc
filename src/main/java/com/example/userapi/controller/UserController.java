@@ -31,12 +31,11 @@ public class UserController {
         @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuario creado exitosamente"),
         @ApiResponse(responseCode = "400", description = "Error en la validación de los datos"),
-        @ApiResponse(responseCode = "409", description = "Correo ya registrado")
+        @ApiResponse(responseCode = "409", description = "Correo ya registrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserDTO request) {
-        userValidator.validate(request);
-
         // Registrar usuario y generar respuesta usando streams y lambdas
         UserResponseDTO savedUserDTO = userService.registerUser(request,
             request.getPhones().stream()
