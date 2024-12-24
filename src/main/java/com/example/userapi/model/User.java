@@ -27,17 +27,14 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
-
     private String password;
-
     private LocalDateTime created;
     private LocalDateTime modified;
     private LocalDateTime lastLogin;
-
     private boolean isActive;
-
     private String token;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Phone> phones = new ArrayList<>();
 }
