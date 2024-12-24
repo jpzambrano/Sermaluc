@@ -15,7 +15,6 @@ Este proyecto es una API RESTful para la gestión de usuarios. Permite registrar
 
 ## Endpoints
 - POST `/api/users/register`: Registra un nuevo usuario.
-- GEST `/api/users/list`: Lista los usuuarios registrados
 
 ## Pruebas
 Ejecuta `./gradlew test` para ejecutar las pruebas unitarias.
