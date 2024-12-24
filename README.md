@@ -1,141 +1,179 @@
-User API Project
-Description
-The User API is a RESTful API that manages user registration and authentication with JWT tokens. It validates user credentials using configurable regular expressions and allows listing all registered users.
+# User API Project
 
-Features
-Register users with validated email and password.
-Automatically generate JWT tokens upon registration.
-Store and retrieve user phone details.
-List all active users.
-Swagger UI integration for API documentation.
-Prerequisites
-To run this project, ensure you have:
+## Overview
 
-Java 17+
-Gradle (or use the provided Gradle Wrapper)
-An IDE (e.g., IntelliJ IDEA, VS Code) or terminal access
-Installation
-Clone the Repository:
+The **User API** is a RESTful service designed for managing user accounts. It allows users to register, generates JWT tokens for authentication, and provides the ability to list all registered users. The project ensures secure validation of user credentials and is built using **Java 17**, **Spring Boot**, and **H2 Database**.
 
-bash
-Copiar código
-git clone https://github.com/jpzambrano/Sermaluc.git
-cd Sermaluc
-Run the Application:
+---
 
-Using Gradle Wrapper:
-bash
-Copiar código
-./gradlew bootRun
-Access Swagger Documentation:
+## Features
 
-Open your browser and navigate to:
-plaintext
-Copiar código
-http://localhost:8080/swagger-ui/index.html
-Endpoints
-Base URL
-plaintext
-Copiar código
+- **User Registration**: Registers a user and generates a secure JWT token.
+- **JWT Authentication**: Provides token-based authentication for secure API interactions.
+- **Phone Management**: Supports storing and managing multiple phone numbers per user.
+- **User Listing**: Retrieves all active registered users.
+- **Swagger Integration**: Interactive API documentation with testing capabilities.
+
+---
+
+## Prerequisites
+
+To run the project, ensure you have the following installed:
+
+- **Java 17 or higher**
+- **Gradle** (optional if using the Gradle wrapper provided)
+
+---
+
+## Installation and Running the Project
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/jpzambrano/Sermaluc.git
+   cd Sermaluc
+   ```
+
+2. **Run the Application**:
+
+   - Using Gradle Wrapper:
+     ```bash
+     ./gradlew bootRun
+     ```
+
+3. **Access Swagger UI**:
+   Open your browser and navigate to:
+   ```plaintext
+   http://localhost:8080/swagger-ui/index.html
+   ```
+
+---
+
+## API Endpoints
+
+### **Base URL**
+
+```plaintext
 http://localhost:8080/api/users
+```
 
-1. Register User
-   Endpoint: POST /register
+### **1. Register User**
 
-Description: Registers a new user with validated credentials and generates a JWT token.
+**Endpoint**: `POST /register`
 
-Request Body:
+**Description**: Registers a new user with validated credentials and generates a JWT token.
 
-json
-Copiar código
+**Request Body**:
+
+```json
 {
-"name": "John Doe",
-"email": "john.doe@example.com",
-"password": "Password@123",
-"phones": [
-{
-"number": "123456789",
-"cityCode": "1",
-"countryCode": "57"
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "Password@123",
+  "phones": [
+    {
+      "number": "123456789",
+      "cityCode": "1",
+      "countryCode": "57"
+    }
+  ]
 }
-]
-}
-Response:
+```
 
-201 Created:
-json
-Copiar código
-{
-"id": "123e4567-e89b-12d3-a456-426614174000",
-"name": "John Doe",
-"email": "john.doe@example.com",
-"created": "2024-12-22T15:00:00",
-"modified": "2024-12-22T15:00:00",
-"lastLogin": "2024-12-22T15:00:00",
-"token": "eyJhbGciOiJIUzI1NiIsInR5...",
-"active": true
-}
-400 Bad Request: Invalid email or password format.
-409 Conflict: Email already registered. 2. List All Users
-Endpoint: GET /list
+**Response**:
 
-Description: Retrieves all active users.
+- **201 Created**:
+  ```json
+  {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "created": "2024-12-22T15:00:00",
+    "modified": "2024-12-22T15:00:00",
+    "lastLogin": "2024-12-22T15:00:00",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5...",
+    "active": true
+  }
+  ```
 
-Response:
+---
 
-200 OK:
-json
-Copiar código
-[
-{
-"id": "123e4567-e89b-12d3-a456-426614174000",
-"name": "John Doe",
-"email": "john.doe@example.com",
-"active": true,
-"phones": [
-{
-"number": "123456789",
-"cityCode": "1",
-"countryCode": "57"
-}
-]
-}
-]
-404 Not Found: No users registered.
-How to Use Swagger
-Swagger provides an interactive UI for testing the API.
+### **2. List All Users**
 
-Start the application.
-Open your browser and navigate to:
-plaintext
-Copiar código
-http://localhost:8080/swagger-ui/index.html
-Explore and test the endpoints.
+**Endpoint**: `GET /list`
 
-Database
-H2 In-Memory Database:
-The API uses H2 for persistence during runtime.
-Access the H2 Console (optional) at:
-plaintext
-Copiar código
-http://localhost:8080/h2-console
-Default credentials:
-Username: sa
-Password:
-Testing
-Run the tests using Gradle:
+**Description**: Retrieves all active users.
 
-bash
-Copiar código
+**Response**:
+
+- **200 OK**:
+  ```json
+  [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "active": true,
+      "phones": [
+        {
+          "number": "123456789",
+          "cityCode": "1",
+          "countryCode": "57"
+        }
+      ]
+    }
+  ]
+  ```
+
+---
+
+## Configuration
+
+1. **Application Properties**:
+
+   - Located in `src/main/resources/application.properties`.
+   - Example:
+     ```properties
+     spring.datasource.url=jdbc:h2:mem:testdb
+     spring.datasource.username=sa
+     spring.datasource.password=password
+     jwt.secret=your-secure-key
+     ```
+
+2. **Swagger**:
+
+   - Accessible at:
+     ```plaintext
+     http://localhost:8080/swagger-ui/index.html
+     ```
+
+3. **H2 Console**:
+   - Accessible at:
+     ```plaintext
+     http://localhost:8080/h2-console
+     ```
+   - Default credentials:
+     - Username: `sa`
+     - Password:
+
+---
+
+## Testing
+
+Run unit and integration tests using Gradle:
+
+```bash
 ./gradlew test
-Expected Output:
+```
 
-Unit tests validate key functionalities (e.g., user validation, JWT token generation).
-Integration tests confirm end-to-end functionality.
-Technologies Used
-Spring Boot: REST API framework.
-H2 Database: In-memory persistence.
-SpringDoc OpenAPI: Swagger integration.
-Lombok: Simplifies code with annotations.
-JWT: Authentication via JSON Web Tokens.
-Gradle: Build and dependency management.
+---
+
+## Technologies Used
+
+- **Java 17**: Language used for implementation.
+- **Spring Boot**: Framework for REST API development.
+- **H2 Database**: In-memory database for persistence.
+- **JWT**: For token-based authentication.
+- **Lombok**: Reduces boilerplate code.
+- **Swagger**: Interactive API documentation.
+- **Gradle**: Build and dependency management.
