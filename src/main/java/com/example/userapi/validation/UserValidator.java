@@ -1,43 +1,64 @@
 package com.example.userapi.validation;
 
+import com.example.userapi.config.InvalidUserDataException;
 import com.example.userapi.dto.UserDTO;
-import com.example.userapi.model.User;
+
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 @Component
 public class UserValidator {
 
-    private static final Map<Predicate<User>, String> validations = Map.of(
-        u -> isEmailValid(u.getEmail()), "El formato del correo es inválido",
-        u -> isPasswordValid(u.getPassword()), "El formato de la clave es inválido"
-    );
-
-    public void validate(UserDTO user) {
-        validations.entrySet().stream()
-            .filter(entry -> !entry.getKey().test(convertToUser(user)))
-            .findFirst()
-            .ifPresent(entry -> {
-                throw new IllegalArgumentException(entry.getValue());
-            });
+    public void validateUser(UserDTO userDTO) {
+        validateField(userDTO.getName(), this::isValidName, "El nombre solo puede contener letras y espacios.");
+        validateField(userDTO.getEmail(), this::isValidEmail, "El correo no tiene un formato válido.");
+        validateField(userDTO.getPassword(), this::isValidPassword, "La contraseña debe cumplir con los requisitos de seguridad.");
+        validatePhones(userDTO);
     }
 
-    private User convertToUser(UserDTO userDTO) {
-        User user = new User();
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
-        return user;
+    public void validatePhones(UserDTO userDTO) {
+        if (userDTO.getPhones() == null || userDTO.getPhones().isEmpty()) {
+            throw new InvalidUserDataException("Debe proporcionar al menos un número de teléfono.");
+        }
+
+        userDTO.getPhones().stream()
+                .filter(phone -> phone.getNumber() == null || phone.getNumber().isBlank())
+                .findFirst()
+                .ifPresent(phone -> {
+                    throw new InvalidUserDataException("El número de teléfono no puede estar vacío.");
+                });
+
+        userDTO.getPhones().stream()
+                .filter(phone -> phone.getCityCode() == null || phone.getCityCode().isBlank())
+                .findFirst()
+                .ifPresent(phone -> {
+                    throw new InvalidUserDataException("El código de ciudad no puede estar vacío.");
+                });
+
+        userDTO.getPhones().stream()
+                .filter(phone -> phone.getCountryCode() == null || phone.getCountryCode().isBlank())
+                .findFirst()
+                .ifPresent(phone -> {
+                    throw new InvalidUserDataException("El código de país no puede estar vacío.");
+                });
     }
 
-    private static boolean isEmailValid(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
-        return email != null && email.matches(emailRegex);
+    private void validateField(String field, Predicate<String> validation, String errorMessage) {
+        if (!validation.test(field)) {
+            throw new InvalidUserDataException(errorMessage);
+        }
     }
 
-    private static boolean isPasswordValid(String password) {
-        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}$";
-        return password != null && password.matches(passwordRegex);
+    private boolean isValidName(String name) {
+        return name != null && name.matches("^[a-zA-Z\\s]+$");
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    private boolean isValidPassword(String password) {
+        return password != null && password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}$");
     }
 }
