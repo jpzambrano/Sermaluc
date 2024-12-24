@@ -1,12 +1,15 @@
 package com.example.userapi.service;
 
 import com.example.userapi.JwtKeyManager;
+import com.example.userapi.config.EmailAlreadyExistsException;
 import com.example.userapi.dto.PhoneDTO;
 import com.example.userapi.dto.UserDTO;
 import com.example.userapi.dto.UserResponseDTO;
 import com.example.userapi.model.Phone;
 import com.example.userapi.model.User;
 import com.example.userapi.repository.UserRepository;
+import com.example.userapi.validation.UserValidator;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
@@ -20,13 +23,18 @@ import java.util.UUID;
 public class UserService {
 
       private final UserRepository userRepository;
+      private final UserValidator userValidator;
 
     public UserService(UserRepository userRepository, JwtKeyManager jwtKeyManager) {
         this.userRepository = userRepository;
+        this.userValidator = new UserValidator();
     }
 
     public UserResponseDTO registerUser(UserDTO userDTO ,List<Phone> phones) {
-        // Asociar teléfonos al usuario
+        userValidator.validateUser(userDTO);
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+                throw new EmailAlreadyExistsException("El correo ya esta registrado");
+            }
         User user = User.builder()
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
