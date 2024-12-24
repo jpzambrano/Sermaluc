@@ -98,35 +98,6 @@ http://localhost:8080/api/users
 
 ---
 
-### **2. List All Users**
-
-**Endpoint**: `GET /list`
-
-**Description**: Retrieves all active users.
-
-**Response**:
-
-- **200 OK**:
-  ```json
-  [
-    {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-      "active": true,
-      "phones": [
-        {
-          "number": "123456789",
-          "cityCode": "1",
-          "countryCode": "57"
-        }
-      ]
-    }
-  ]
-  ```
-
----
-
 ## Configuration
 
 1. **Application Properties**:
