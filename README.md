@@ -11,7 +11,6 @@ The **User API** is a RESTful service designed for managing user accounts. It al
 - **User Registration**: Registers a user and generates a secure JWT token.
 - **JWT Authentication**: Provides token-based authentication for secure API interactions.
 - **Phone Management**: Supports storing and managing multiple phone numbers per user.
-- **User Listing**: Retrieves all active registered users.
 - **Swagger Integration**: Interactive API documentation with testing capabilities.
 
 ---
@@ -107,7 +106,7 @@ http://localhost:8080/api/users
      ```properties
      spring.datasource.url=jdbc:h2:mem:testdb
      spring.datasource.username=sa
-     spring.datasource.password=password
+     spring.datasource.password=
      jwt.secret=your-secure-key
      ```
 
