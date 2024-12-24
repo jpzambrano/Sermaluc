@@ -1,11 +1,13 @@
 package com.example.userapi.dto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PhoneDTO {
     private String number;
     private String cityCode;
